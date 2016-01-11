@@ -186,11 +186,11 @@ private void InitializeNugetBuildDirectory(string frameworkMoniker)
 {
 	var pathToBinary = Path.Combine(pathToBuildDirectory, frameworkMoniker +  "/Binary");	
 	CreateDirectory(pathToBinary);
-	RoboCopy("../../../LightInject.xUnit2", pathToBinary, "/e /XD bin obj .vs NuGet TestResults packages");	
+	RoboCopy("../../../LightInject.xUnit", pathToBinary, "/e /XD bin obj .vs NuGet TestResults packages");	
 				
 	var pathToSource = Path.Combine(pathToBuildDirectory,  frameworkMoniker +  "/Source");	
 	CreateDirectory(pathToSource);
-	RoboCopy("../../../LightInject.xUnit2", pathToSource, "/e /XD bin obj .vs NuGet TestResults packages");
+	RoboCopy("../../../LightInject.xUnit", pathToSource, "/e /XD bin obj .vs NuGet TestResults packages");
 	
 	if (frameworkMoniker.StartsWith("DNX"))
 	{
