@@ -21,7 +21,12 @@ public static class DNU
 }
 
 public static void RoboCopy(string source, string destination, string arguments = null)
-{
+{    
+    if (!Directory.Exists(source))
+    {
+        throw new InvalidOperationException(string.Format("The directory {0} does not exist", source));
+    }
+    
     Command.Execute("robocopy", string.Format("{0} {1} {2}", source, destination, arguments));    
 }
 
