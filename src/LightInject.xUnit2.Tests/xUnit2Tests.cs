@@ -5,6 +5,7 @@ namespace LightInject.xUnit2.Tests
 {
     using System;
     using System.Runtime.CompilerServices;
+    using System.Security.Cryptography;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -48,6 +49,14 @@ namespace LightInject.xUnit2.Tests
         {
             Assert.True(value == "value1" || value == "value2");
         }
+
+
+        [Theory, Scoped, InjectData("value1"), InjectData("value2")]
+        public void ScopedMethodWithMultipleInjectData(string value)
+        {
+            Assert.True(value == "value1" || value == "value2");
+        }
+
 
         [Theory, InjectData("value1")]
         public void MethodWithServiceAndValue(IFoo foo, string value)

@@ -21,7 +21,7 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 ******************************************************************************
-    LightInject.xUnit version 2.0.0.4
+    LightInject.xUnit version 2.0.0.5
     http://www.lightinject.net/
     http://twitter.com/bernhardrichter
 ******************************************************************************/
@@ -38,6 +38,7 @@ namespace LightInject.xUnit2
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
     using LightInject;
@@ -49,9 +50,6 @@ namespace LightInject.xUnit2
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class InjectDataAttribute : DataAttribute
     {
-        private static readonly ConcurrentDictionary<MethodInfo, Scope> Scopes =
-            new ConcurrentDictionary<MethodInfo, Scope>();
-
         private static readonly ConcurrentDictionary<Type, IServiceContainer> Containers =
             new ConcurrentDictionary<Type, IServiceContainer>();
 
@@ -87,7 +85,14 @@ namespace LightInject.xUnit2
         /// <param name="method">The <see cref="MethodInfo"/> representing the method for which to end the <see cref="Scope"/>.</param>
         public static void EndScope(MethodInfo method)
         {
-            Scopes[method].Dispose();
+            IServiceContainer container;
+            if (Containers.TryGetValue(method.ReflectedType, out container))
+            {
+                if (container.ScopeManagerProvider.GetScopeManager().CurrentScope != null)
+                {
+                    container.EndCurrentScope();
+                }
+            }
         }
 
         /// <summary>
@@ -101,17 +106,24 @@ namespace LightInject.xUnit2
             ParameterInfo[] parameters = methodUnderTest.GetParameters();
             if (ShouldStartScope(methodUnderTest))
             {
-                Scopes.TryAdd(methodUnderTest, container.BeginScope());
+                container.BeginScope();
             }
 
             return ResolveParameters(container, parameters);
         }
 
+        /// <summary>
+        /// This method is only executed when the test app domains are unloaded.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
         private static void EndAllScopes()
         {
-            foreach (var scope in Scopes)
+            foreach (var container in Containers.Values)
             {
-                scope.Value.Dispose();
+                while (container.ScopeManagerProvider.GetScopeManager().CurrentScope != null)
+                {
+                    container.EndCurrentScope();
+                }
             }
         }
 
