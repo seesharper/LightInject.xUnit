@@ -21,7 +21,7 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 ******************************************************************************
-    LightInject.xUnit version 2.0.0.5
+    LightInject.xUnit version 2.1.0
     http://www.lightinject.net/
     http://twitter.com/bernhardrichter
 ******************************************************************************/
