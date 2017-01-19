@@ -21,7 +21,7 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 ******************************************************************************
-    LightInject.xUnit version 2.1.0
+    LightInject.xUnit version 3.0.0
     http://www.lightinject.net/
     http://twitter.com/bernhardrichter
 ******************************************************************************/
@@ -88,9 +88,10 @@ namespace LightInject.xUnit2
             IServiceContainer container;
             if (Containers.TryGetValue(method.ReflectedType, out container))
             {
-                if (container.ScopeManagerProvider.GetScopeManager().CurrentScope != null)
+                var scopeManager = container.ScopeManagerProvider.GetScopeManager(container);
+                if (scopeManager.CurrentScope != null)
                 {
-                    container.EndCurrentScope();
+                    scopeManager.CurrentScope.Dispose();
                 }
             }
         }
@@ -120,9 +121,10 @@ namespace LightInject.xUnit2
         {
             foreach (var container in Containers.Values)
             {
-                while (container.ScopeManagerProvider.GetScopeManager().CurrentScope != null)
+                var scopeManager = container.ScopeManagerProvider.GetScopeManager(container);
+                while (scopeManager.CurrentScope != null)
                 {
-                    container.EndCurrentScope();
+                    container.Dispose();
                 }
             }
         }
